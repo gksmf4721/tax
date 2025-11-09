@@ -4,6 +4,7 @@ import com.kcd.tax.common.error.CommonErrorCode.*
 import com.kcd.tax.common.error.exception.ApiCommonException
 import com.kcd.tax.domain.business.dto.request.BusinessAuthorityUpdateReqDto
 import com.kcd.tax.domain.business.dto.response.BusinessAuthorityResDto
+import com.kcd.tax.domain.business.entity.Business
 import com.kcd.tax.domain.business.entity.BusinessAuthority
 import com.kcd.tax.domain.business.repository.BusinessAuthorityRepository
 import com.kcd.tax.domain.business.repository.BusinessRepository
@@ -65,5 +66,18 @@ class BusinessService(
         )
         authority.isDelete = isDelete
         businessAuthorityRepository.save(authority)
+    }
+
+
+    // ===== Service To Service =====
+    // ADMIN: 모든 사업장 조회
+    fun findBusinessAll(): List<Business> {
+        return businessRepository.findAll()
+    }
+
+    // MANAGER: 권한 부여받은 모든 사업장 조회
+    fun findBusinessByUserId(userId: Long): List<Business> {
+        return businessAuthorityRepository.findByUserIdAndIsActiveAndIsDelete(userId, true, false)
+            .map { it.business }
     }
 }

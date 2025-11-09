@@ -17,3 +17,7 @@ logging:
     org:
       hibernate:
         SQL: DEBUG
+
+vat:
+  rate-divisor: 11.0
+  round-unit: 10
