@@ -8,6 +8,9 @@ enum class UserRole(val value: Int) {
     MANAGER(2);
 
     companion object {
-        fun fromName(name: String?): UserRole = UserRole.entries.first { it.name.equals(name, ignoreCase = true) }
+        fun fromValue(value: Int) = UserRole.entries.first { it.value == value }
+
+        fun fromName(name: String?): UserRole = UserRole.entries
+            .first { it.name.equals(name, ignoreCase = true) }
     }
 }
