@@ -9,5 +9,8 @@ enum class CommonErrorCode(
 ) {
 
     // common
-    UNKNOWN_INTERNAL_ERROR(10000, "알 수 없는 서버 에러.", HttpStatus.INTERNAL_SERVER_ERROR)
+    UNKNOWN_INTERNAL_ERROR(10000, "알 수 없는 서버 에러.", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    // db
+    DATA_TOO_LONG(10001, "데이터 허용 범위를 벗어났습니다.", HttpStatus.CONFLICT);
 }
