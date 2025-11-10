@@ -5,6 +5,11 @@ import com.kcd.tax.domain.business.service.BusinessService
 import com.kcd.tax.common.enums.UserRole.*
 import com.kcd.tax.common.error.CommonErrorCode.*
 import com.kcd.tax.common.error.exception.ApiCommonException
+import com.kcd.tax.domain.business.entity.Business
+import com.kcd.tax.domain.collection.dto.request.CollectionDataReqDto
+import com.kcd.tax.domain.collection.entity.CollectionRequest
+import com.kcd.tax.domain.collection.enums.RecordType.PURCHASE
+import com.kcd.tax.domain.collection.enums.RecordType.SALES
 import com.kcd.tax.domain.vat.dto.response.VatDetailResDto
 import com.kcd.tax.domain.vat.entity.PurchaseRecord
 import com.kcd.tax.domain.vat.entity.SalesRecord
@@ -17,7 +22,9 @@ import com.kcd.tax.domain.vat.repository.SalesRecordRepository
 import com.kcd.tax.domain.vat.repository.VatPeriodRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.math.roundToInt
 
 @Service
@@ -112,5 +119,38 @@ class VatService(
 
         return vatPeriodRepository.findByYearAndHalf(y, h.value)
             ?: throw ApiCommonException(NOT_FOUND_VAT_PERIOD)
+    }
+
+    // 매입/매출 내역 저장
+    @Transactional
+    fun saveAllRecords(
+        business: Business,
+        request: CollectionRequest,
+        readRecords: List<CollectionDataReqDto>,
+        period: VatPeriod
+    ) {
+        val now = LocalDateTime.now()
+
+        // purchase 매입
+        purchaseRecordRepository.saveAll(
+            PurchaseRecord.toEntity(
+                business = business,
+                request = request,
+                records = readRecords.filter { it.recordType == PURCHASE },
+                period = period,
+                now = now
+            )
+        )
+
+        // sales 매출
+        salesRecordRepository.saveAll(
+            SalesRecord.toEntity(
+                business = business,
+                request = request,
+                records = readRecords.filter { it.recordType == SALES },
+                period = period,
+                now = now
+            )
+        )
     }
 }

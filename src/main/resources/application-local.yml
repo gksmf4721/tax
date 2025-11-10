@@ -4,7 +4,6 @@ spring:
     username: root
     password: ""
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
       ddl-auto: update  # 필요 시 validate, create 등으로 변경
@@ -12,11 +11,28 @@ spring:
     properties:
       hibernate.format_sql: true
 
+  redis:
+    host: localhost
+    port: 6379
+
+redisson:
+  config: |
+    singleServerConfig:
+      address: "redis://localhost:6379"
+      connectionMinimumIdleSize: 5
+      connectionPoolSize: 10
+    threads: 2
+    nettyThreads: 2
+
 logging:
   level:
     org:
       hibernate:
         SQL: DEBUG
+
+common:
+  file:
+    sample-path: "src/main/kotlin/com/kcd/tax/infrastructure/sample.xlsx"
 
 vat:
   rate-divisor: 11.0

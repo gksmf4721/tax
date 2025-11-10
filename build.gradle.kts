@@ -33,6 +33,10 @@ dependencies {
 
     // DB (MySQL)
     implementation("com.mysql:mysql-connector-j:8.0.33")
+
+    // 엑셀 읽기/쓰기용 Apache POI
+    implementation("org.apache.poi:poi:5.2.3")           // 기본 POI
+    implementation("org.apache.poi:poi-ooxml:5.2.3")     // .xlsx 지원
 }
 
 kotlin {

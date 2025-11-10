@@ -1,6 +1,7 @@
 package com.kcd.tax.domain.vat.entity
 
 import com.kcd.tax.domain.business.entity.Business
+import com.kcd.tax.domain.collection.dto.request.CollectionDataReqDto
 import com.kcd.tax.domain.collection.entity.CollectionRequest
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -40,4 +41,26 @@ data class PurchaseRecord(
 
     @Column(nullable = false)
     val createdAt: LocalDateTime
-)
+)  {
+    companion object {
+        fun toEntity(
+            business: Business,
+            request: CollectionRequest,
+            records: List<CollectionDataReqDto>,
+            period: VatPeriod,
+            now: LocalDateTime
+        ): List<PurchaseRecord> {
+            return records.map { record ->
+                PurchaseRecord(
+                    business = business,
+                    collectionRequest = request,
+                    vatPeriod = period,
+                    amount = record.amount,
+                    recordDate = record.recordDate,
+                    createdAt = now
+                )
+            }
+        }
+    }
+}
+

@@ -80,4 +80,10 @@ class BusinessService(
         return businessAuthorityRepository.findByUserIdAndIsActiveAndIsDelete(userId, true, false)
             .map { it.business }
     }
+
+    // 사업자 번호로 사업장 조회
+    fun findBusinessByRegistrationNumber(registrationNumber: String): Business {
+        return businessRepository.findByRegistrationNumber(registrationNumber)
+            ?: throw ApiCommonException(NOT_FOUND_BUSINESS)
+    }
 }
