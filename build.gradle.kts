@@ -37,6 +37,9 @@ dependencies {
     // 엑셀 읽기/쓰기용 Apache POI
     implementation("org.apache.poi:poi:5.2.3")           // 기본 POI
     implementation("org.apache.poi:poi-ooxml:5.2.3")     // .xlsx 지원
+
+    // Redis 분산 락
+    implementation("org.redisson:redisson-spring-boot-starter:3.27.2")
 }
 
 kotlin {

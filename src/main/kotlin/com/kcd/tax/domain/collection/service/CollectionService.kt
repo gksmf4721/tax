@@ -15,9 +15,12 @@ import org.springframework.transaction.annotation.Transactional
 import com.kcd.tax.domain.vat.entity.VatPeriod
 import com.kcd.tax.domain.vat.enums.VatHalfType
 import com.kcd.tax.domain.vat.service.VatService
+import org.redisson.api.RedissonClient
 import org.springframework.transaction.support.TransactionSynchronization
 import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.LocalDateTime
+import com.kcd.tax.common.enums.RedissonLockKeys.COLLECTION_LOCK
+import java.util.concurrent.TimeUnit
 
 @Service
 class CollectionService(
@@ -29,7 +32,10 @@ class CollectionService(
     private val vatService: VatService,
 
     // collector
-    private val collectorClient: CollectorClient
+    private val collectorClient: CollectorClient,
+
+    // lib
+    private val redissonClient: RedissonClient
 ) {
 
     /**`
@@ -39,35 +45,40 @@ class CollectionService(
     fun setCollectionRequest(dto: CollectionRequestReqDto) {
         val now = LocalDateTime.now()
         val business = businessService.findBusinessByRegistrationNumber(dto.registrationNumber)
-
-        // 상/하반기 조회
         val period = findVatPeriodByYearAndHalf(dto.year, dto.halfType)
 
-        // 최근 요청 값
-        val existingRequest = findByBusinessIdAndVatPeriodIdAndIsDelete(business.id!!, period.id!!)
+        // Redis 락: 사업장 기준으로 잠금
+        val lock = redissonClient.getLock(COLLECTION_LOCK.getKey(business.id!!))
+        val isLocked = lock.tryLock(0, 10, TimeUnit.SECONDS)
+        if (!isLocked) throw ApiCommonException(ALREADY_COLLECTING)
 
-        // 이번 요청 전에 했던 요청은 삭제 처리
-        existingRequest?.let {
-            if (existingRequest.status != COLLECTED.value) throw ApiCommonException(ALREADY_COLLECTING)
-            existingRequest.isDelete = true
-            collectionRequestRepository.save(existingRequest)
-        }
-
-        // 수집 요청 테이블에 수집기가 요청을 받기 전 상태인 NOT_REQUESTED 저장
-        val request = collectionRequestRepository.save(
-            CollectionRequest.toEntity(period, business, now, NOT_REQUESTED.value)
-        )
-
-        // 수집기 비동기 처리 (트랜잭션이 커밋된 후 비동기 호출)
-        TransactionSynchronizationManager.registerSynchronization(
-            object : TransactionSynchronization {
-                override fun afterCommit() {
-                    // 트랜잭션 커밋된 다음에 호출됨
-                    collectorClient.processCollectionAsync(business, request, period)
-                }
+        try {
+            // 기존 요청이 있다면 삭제 처리
+            val existRequest = findByBusinessIdAndVatPeriodIdAndIsDelete(business.id, period.id!!)
+            existRequest?.let {
+                it.isDelete = true
+                collectionRequestRepository.save(it)
             }
-        )
+
+            // 새 수집 요청 저장
+            val request = collectionRequestRepository.save(
+                CollectionRequest.toEntity(period, business, now, NOT_REQUESTED.value)
+            )
+
+            // 커밋 후 비동기 수집 호출
+            TransactionSynchronizationManager.registerSynchronization(
+                object : TransactionSynchronization {
+                    override fun afterCommit() {
+                        collectorClient.processCollectionAsync(business, request, period)
+                    }
+                }
+            )
+        } finally {
+            // 락 해제
+            if (lock.isHeldByCurrentThread) lock.unlock()
+        }
     }
+
 
     /**`
      * 매출/매입 수집 상태 조회
@@ -82,6 +93,7 @@ class CollectionService(
 
         return CollectionStatusResDto(status)
     }
+
 
     // 상/하반기에 따른 기간 ID 조회
     private fun findVatPeriodByYearAndHalf(year: Int?, halfType: VatHalfType?): VatPeriod {

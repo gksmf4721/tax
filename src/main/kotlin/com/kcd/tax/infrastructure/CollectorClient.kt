@@ -42,7 +42,7 @@ class CollectorClient(
 
                 // 작업이 성공적으로 수행되면 COLLECTED 상태로 변경
                 collectorStatusUpdater.updateCollectionRequestStatus(requestId, COLLECTED)
-            }, Instant.now().plus(Duration.ofMinutes(1)))
+            }, Instant.now().plus(Duration.ofMinutes(5)))
 
         } catch (e: Exception) {
 
