@@ -1,11 +1,13 @@
 package com.kcd.tax.domain.collection.repository
 
 import com.kcd.tax.domain.collection.entity.CollectionRequest
-import org.springframework.data.jpa.repository.JpaRepository
+import java.util.Optional
 
-interface CollectionRequestRepository : JpaRepository<CollectionRequest, Long> {
+interface CollectionRequestRepository {
 
-    fun findByBusinessIdAndIsDelete(businessId: Long, isDelete: Boolean): CollectionRequest?
+    fun findByBusinessIdAndVatPeriodIdAndIsDelete(businessId: Long, periodId: Long, isDelete: Boolean): CollectionRequest?
 
-    fun findByBusinessIdAndVatPeriodIdAndIsDelete(businessId: Long, vatPeriodId: Long, isDelete: Boolean): CollectionRequest?
+    fun save(request: CollectionRequest): CollectionRequest
+
+    fun findById(requestId: Long): Optional<CollectionRequest> // CollectorStatusUpdater에서 사용
 }

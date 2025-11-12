@@ -1,9 +1,9 @@
-package com.kcd.tax.infrastructure
+package com.kcd.tax.infrastructure.persistence.support
 
-import com.kcd.tax.common.error.CommonErrorCode.NOT_FOUND_COLLECTION_REQUEST
+import com.kcd.tax.common.error.CommonErrorCode
 import com.kcd.tax.common.error.exception.ApiCommonException
 import com.kcd.tax.domain.collection.enums.CollectionStatus
-import com.kcd.tax.domain.collection.repository.CollectionRequestRepository
+import com.kcd.tax.infrastructure.persistence.repository.CollectionRequestJpaRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 
 @Component
 class CollectorStatusUpdater(
-    private val collectionRequestRepository: CollectionRequestRepository
+    private val collectionRequestJpaRepository: CollectionRequestJpaRepository
 ) {
 
     /**`
@@ -20,11 +20,11 @@ class CollectorStatusUpdater(
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun updateCollectionRequestStatus(requestId: Long, status: CollectionStatus) {
         val now = LocalDateTime.now()
-        val request = collectionRequestRepository.findById(requestId)
-            .orElseThrow { throw ApiCommonException(NOT_FOUND_COLLECTION_REQUEST) }
+        val request = collectionRequestJpaRepository.findById(requestId)
+            .orElseThrow { throw ApiCommonException(CommonErrorCode.NOT_FOUND_COLLECTION_REQUEST) }
 
         request.status = status.value
         request.requestedAt = now
-        collectionRequestRepository.save(request)
+        collectionRequestJpaRepository.save(request)
     }
 }

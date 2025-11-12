@@ -1,8 +1,9 @@
-package com.kcd.tax.domain.business.controller
+package com.kcd.tax.presentation.business
 
 import com.kcd.tax.common.dto.CommonParamDto
 import com.kcd.tax.common.dto.CommonResDto
 import com.kcd.tax.common.dto.ResponseDto
+import com.kcd.tax.domain.business.dto.request.BusinessAuthorityInsertReqDto
 import com.kcd.tax.domain.business.dto.request.BusinessAuthorityUpdateReqDto
 import com.kcd.tax.domain.business.dto.response.BusinessAuthorityResDto
 import com.kcd.tax.domain.business.service.BusinessService
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/business")
+@RequestMapping("/api/businesses")
 class BusinessController(
     private val businessService: BusinessService
 ) {
@@ -36,13 +37,13 @@ class BusinessController(
     /**`
      * 새로운 유저 권한 추가
      */
-    @PostMapping("/{businessId}/authorities/{userId}")
+    @PostMapping("/{businessId}/authorities")
     fun setBusinessAuthority(
         @PathVariable businessId: Long,
-        @PathVariable userId: Long,
+        @RequestBody dto: BusinessAuthorityInsertReqDto,
         common: CommonParamDto
     ): ResponseDto<CommonResDto> {
-        businessService.setBusinessAuthority(businessId, userId)
+        businessService.setBusinessAuthority(businessId, dto)
         return ResponseDto.of(CommonResDto.success(), common)
     }
 

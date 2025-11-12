@@ -17,7 +17,7 @@ data class VatPeriod(
     @Column(nullable = false)
     val year: Int,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TINYINT UNSIGNED")
     val half: Int,
 
     @Column(nullable = false)

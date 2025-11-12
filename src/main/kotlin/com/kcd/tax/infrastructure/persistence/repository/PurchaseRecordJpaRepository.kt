@@ -1,9 +1,9 @@
-package com.kcd.tax.domain.vat.repository
+package com.kcd.tax.infrastructure.persistence.repository
 
-import com.kcd.tax.domain.vat.entity.PurchaseRecord
+import com.kcd.tax.domain.collection.entity.PurchaseRecord
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface PurchaseRecordRepository : JpaRepository<PurchaseRecord, Long> {
+interface PurchaseRecordJpaRepository : JpaRepository<PurchaseRecord, Long> {
 
     fun findByBusinessIdInAndVatPeriodIdAndCollectionRequestIsDeleteFalse(
         businessIds: List<Long>,

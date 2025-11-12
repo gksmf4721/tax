@@ -20,7 +20,7 @@ data class User(
     @Column(nullable = false, length = 255)
     val password: String,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TINYINT UNSIGNED")
     val role: Int,
 
     @Column(nullable = false)

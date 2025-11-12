@@ -1,7 +1,6 @@
 package com.kcd.tax.domain.business.dto.response
 
 import com.kcd.tax.common.enums.UserRole
-import com.kcd.tax.domain.business.entity.BusinessAuthority
 
 data class BusinessAuthorityResDto(
     val id: Long,
@@ -9,17 +8,15 @@ data class BusinessAuthorityResDto(
     val role: UserRole,
     val isActive: Boolean
 ) {
+
     companion object {
-        fun toDto(entities: List<BusinessAuthority>): List<BusinessAuthorityResDto> {
-            return entities.map { entity ->
-                val user = entity.user
-                BusinessAuthorityResDto(
-                    id = user.id!!,
-                    username = user.username,
-                    role = UserRole.fromValue(user.role),
-                    isActive = entity.isActive
-                )
-            }
+        fun toDto(userId: Long, username: String, role: UserRole, isActive: Boolean): BusinessAuthorityResDto {
+            return BusinessAuthorityResDto(
+                id = userId,
+                username = username,
+                role = role,
+                isActive = isActive
+            )
         }
     }
 }

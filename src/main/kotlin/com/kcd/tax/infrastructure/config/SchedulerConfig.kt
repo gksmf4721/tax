@@ -1,4 +1,4 @@
-package com.kcd.tax.common.config
+package com.kcd.tax.infrastructure.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

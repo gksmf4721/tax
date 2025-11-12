@@ -1,12 +1,12 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/tax
+    url: jdbc:mysql://localhost:3305/tax
     username: root
-    password: ""
+    password: n7532056@
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update  # 필요 시 validate, create 등으로 변경
+      ddl-auto: validate  # 필요 시 none, create, update 등으로 변경
     show-sql: true
     properties:
       hibernate.format_sql: true
@@ -31,8 +31,8 @@ logging:
         SQL: DEBUG
 
 common:
-  file:
-    sample-path: "src/main/kotlin/com/kcd/tax/infrastructure/sample.xlsx"
+  collector:
+    path: "src/main/resources/sample.xlsx"
 
 vat:
   rate-divisor: 11.0
