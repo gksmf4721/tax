@@ -19,7 +19,10 @@ class CommonParamFilter(
 ) : OncePerRequestFilter() {
 
     private val pathMatcher = AntPathMatcher()
-    private val restrictedEndpoints = listOf("/api/business/**")
+    private val restrictedEndpoints = listOf(
+        "/api/businesses/*/authorities",
+        "/api/businesses/*/authorities/*"
+    )
 
     override fun doFilterInternal(
         request: HttpServletRequest,
